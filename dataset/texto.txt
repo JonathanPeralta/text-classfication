@@ -1,0 +1,30 @@
+villa santa maría - ica ,
+san antonio de mala,
+villa san antonio de chiclayo,
+villa saraja,
+
+
+
+alto piura,
+san antonio de chiclayo,
+posada de carabayllo,
+molinos de carabayllo,
+cascadas de carabayllo,
+san antonio de carabayllo,
+san antonio de pachacamac,
+san antonio de mala,
+olivar de pisco,
+posada del sol - ica,
+estancia de santa maría - ica,
+1,0,1,0,0,0,0,0,0,0,0,0,1,1,1,0,0
+0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0
+
+caleta de san antonio
+general
+
+
+
+'villa santa maría - ica','san antonio de mala - c','villa san antonio de chiclayo','villa saraja','alto piura','san antonio de chiclayo','posada de carabayllo','molinos de carabayllo','cascadas de carabayllo','san antonio de carabayllo','san antonio de pachacamac','san antonio de mala - t','olivar de pisco','posada del sol - ica','estancia de santa maría - ica','caleta de san antonio','general'
+
+'toxic', 'severe_toxic', 'obscene', 'threat', 'insult', 'identity_hate'
