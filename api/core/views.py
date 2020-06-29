@@ -1,6 +1,7 @@
 from django.shortcuts import render
 # from . forms import MyForm
 import json
+import logging
 from rest_framework import viewsets
 from rest_framework.decorators import api_view
 from django.core import serializers
@@ -19,12 +20,14 @@ from . serializer import DocumentSerializar
 # from sklearn import preprocessing
 # import pandas as pd
 import docx
+logger = logging.getLogger(__name__)
+
 
 
 class DocumentView(viewsets.ModelViewSet):
 	queryset = Document.objects.all()
 	serializer_class = DocumentSerializar
-		
+
 @api_view(["POST"])
 def prueba(request):
     try:
@@ -32,9 +35,11 @@ def prueba(request):
         d = list(mydata.values())
         document = Document(archive=d[0])
         document.save()
-        print(document.id)
+        # print(document.id)
+        logger.info(document.id)
         lastdocument = Document.objects.get(pk=document.id)
-        print(lastdocument.archive)
+        # print(lastdocument.archive)
+        logger.info(lastdocument.archive)
         
         doc = docx.Document(lastdocument.archive)
         var = ""
@@ -42,7 +47,9 @@ def prueba(request):
             if i.text != "":
                 var += i.text
 
-        print(var)
+        # print(var)
+        logger.info(var)
+
 
         # mdl=joblib.load("/Users/sahityasehgal/Documents/Coding/DjangoApiTutorial/DjangoAPI/MyAPI/loan_model.pkl")
         # #mydata=pd.read_excel('/Users/sahityasehgal/Documents/Coding/bankloan/test.xlsx')
