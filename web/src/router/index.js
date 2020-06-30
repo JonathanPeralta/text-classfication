@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import HelloWorld from '@/components/HelloWorld'
+import Home from '@/components/Home'
 import prueba from '@/components/prueba/prueba'
 import edit from '@/components/prueba/edit'
 import eliminar from '@/components/prueba/delete'
@@ -9,13 +9,14 @@ import VueResource from 'vue-resource';
 
 Vue.use(VueResource);
 Vue.use(Router)
+// Vue.component('Footer', require('../components/Footer.vue')); 
 
 export default new Router({
   routes: [
     {
       path: '/',
-      name: 'HelloWorld',
-      component: HelloWorld
+      name: 'Home',
+      component: Home
     },
     {
       path: '/prueba',
