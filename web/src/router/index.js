@@ -5,6 +5,7 @@ import prueba from '@/components/prueba/prueba'
 import edit from '@/components/prueba/edit'
 import eliminar from '@/components/prueba/delete'
 import nuevo from '@/components/prueba/nuevo'
+import Recomendation from '@/components/Recomendation'
 import VueResource from 'vue-resource';
 
 Vue.use(VueResource);
@@ -37,6 +38,11 @@ export default new Router({
       path: '/prueba/nuevo',
       name: 'nuevo',
       component: nuevo
+    },
+    {
+      path: '/r',
+      name: 'recomendation',
+      component: Recomendation
     }
   ],
   mode:'history'

@@ -35,6 +35,7 @@
       </div>
     </div>
   </section>
+  
 </template>
 
 <script>
@@ -59,7 +60,11 @@ export default {
             axios.post(path,this.form,{ headers: {
                     'Content-Type': 'multipart/form-data'
                   }}).then((response) => {
-                console.log(response);
+                console.log(response.data);
+                
+                if(response.data.res == "ok"){
+                  this.$router.push({name:'recomendation',params:{p:response.data.text}})
+                }
                 // location.href="/prueba/"
             }).catch((error)=>{
                 console.log(error)

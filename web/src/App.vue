@@ -1,8 +1,8 @@
 <template>
   <div id="app">
-    <!-- <router-view/> -->
-    <Home/>
-    <Footer/>
+    <router-view/>
+    <!-- <Home/> -->
+    <!-- <Footer/> -->
   </div>
 </template>
 
@@ -10,11 +10,14 @@
 
 import Footer from './components/Footer';
 import Home from './components/Home';
+import Recomendation from './components/Recomendation';
+
 export default {
   name: 'App',
   components:{
     'Home':Home,
-    'Footer':Footer
+    'Footer':Footer,
+    'Recomendation':Recomendation
   }
 }
 </script>
