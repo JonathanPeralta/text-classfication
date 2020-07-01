@@ -2,6 +2,9 @@ from django.shortcuts import render
 # from . forms import MyForm
 import json
 import logging
+import requests
+
+from bs4 import BeautifulSoup
 from rest_framework import viewsets
 from rest_framework.decorators import api_view
 from django.core import serializers
@@ -46,31 +49,51 @@ def prueba(request):
         d = list(mydata.values())
         document = Document(archive=d[0])
         document.save()
-        print(document.id)
-        # logger.info(document.id)
+
         lastdocument = Document.objects.get(pk=document.id)
-        print(lastdocument.archive)
-        # logger.info(lastdocument.archive)
 
         patharchive = str(lastdocument.archive)
-        # print(str(patharchive))
 
         archivename = patharchive.split('/')[1]
         archivetype = archivename.split('.')[1]
-        
-        # print(archivetype)
         
         if archivetype=="pdf":
             text = textpdf(patharchive)
         else:
             text = textword(patharchive)
 
-        print(text)
-        # logger.info(var)
         words = nltk.word_tokenize(text)
         words = normalize(words)
-
         print(words)
+        # datos = urllib.request.urlopen('https://pe.indeed.com/Empleos-de-desarrollador').read().decode()
+        # print(datos)
+        # URL = 'https://pe.indeed.com/Empleos-de-desarrollador'
+        # page = requests.get(URL)
+        # print(type(page.content.decode("utf-8")))
+        # soup =  BeautifulSoup(page.content.decode("utf-8"),"html.parser")
+        # results = soup.find(id='resultsCol')
+        # tags = soup('a')
+        # mydivs = soup.find_all("div")
+        # mydivs = soup.div
+        # mydivs =  soup.select('div#resultsCol')
+        # mydivs = soup.find({"id": "resultsCol"})
+        # mydivs = soup.find_all("div", class_="result")
+        # print(type(results))
+        # job_elems = results.find_all('div', class_='clickcard')
+        # print(results.prettify())
+        # print(type(job_elems))
+        # print(job_elems)
+
+        lista = []
+        # lista = results.prettify()
+        # if mydivs != None:
+        #     for md in mydivs:
+        #         # lista.append(md)
+        #         print(md)
+        
+        
+        
+        
         # mdl=joblib.load("/Users/sahityasehgal/Documents/Coding/DjangoApiTutorial/DjangoAPI/MyAPI/loan_model.pkl")
         # #mydata=pd.read_excel('/Users/sahityasehgal/Documents/Coding/bankloan/test.xlsx')
         # mydata=request.data
@@ -83,9 +106,9 @@ def prueba(request):
         # newdf=pd.DataFrame(y_pred, columns=['Status'])
         # newdf=newdf.replace({True:'Approved', False:'Rejected'})
         # return JsonResponse('Your Status is {}'.format(newdf), safe=False)
-        return JsonResponse('Your Status is F', safe=False)
+        return JsonResponse({'lista':lista,'res':'ok'}, safe=False)
     except ValueError as e:
-        return Response(e.args[0]+text, status.HTTP_400_BAD_REQUEST)
+        return Response(e.args[0], status.HTTP_400_BAD_REQUEST)
 
 
 
