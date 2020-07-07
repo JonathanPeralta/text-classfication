@@ -22,6 +22,11 @@ from . serializer import DocumentSerializar
 # import numpy as np
 # from sklearn import preprocessing
 # import pandas as pd
+import sklearn.datasets as skd
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfTransformer
+from sklearn.naive_bayes import MultinomialNB
+
 import nltk
 import inflect
 import re
@@ -62,53 +67,166 @@ def prueba(request):
         else:
             text = textword(patharchive)
 
-        words = nltk.word_tokenize(text)
-        words = normalize(words)
-        print(words)
-        # datos = urllib.request.urlopen('https://pe.indeed.com/Empleos-de-desarrollador').read().decode()
-        # print(datos)
-        # URL = 'https://pe.indeed.com/Empleos-de-desarrollador'
-        # page = requests.get(URL)
-        # print(type(page.content.decode("utf-8")))
-        # soup =  BeautifulSoup(page.content.decode("utf-8"),"html.parser")
-        # results = soup.find(id='resultsCol')
-        # tags = soup('a')
-        # mydivs = soup.find_all("div")
-        # mydivs = soup.div
-        # mydivs =  soup.select('div#resultsCol')
-        # mydivs = soup.find({"id": "resultsCol"})
-        # mydivs = soup.find_all("div", class_="result")
-        # print(type(results))
-        # job_elems = results.find_all('div', class_='clickcard')
-        # print(results.prettify())
-        # print(type(job_elems))
-        # print(job_elems)
 
-        lista = []
-        # lista = results.prettify()
-        # if mydivs != None:
-        #     for md in mydivs:
-        #         # lista.append(md)
-        #         print(md)
+        # words = nltk.word_tokenize(text)
+        # words = normalize(words)
+
+
+        category = proccess(text)
+
+        # print(words)
+        # print(category)
+        keywords = keywords_function(category)
+
+      
         
-        
-        
-        
-        # mdl=joblib.load("/Users/sahityasehgal/Documents/Coding/DjangoApiTutorial/DjangoAPI/MyAPI/loan_model.pkl")
-        # #mydata=pd.read_excel('/Users/sahityasehgal/Documents/Coding/bankloan/test.xlsx')
-        # mydata=request.data
-        # unit=np.array(list(mydata.values()))
-        # unit=unit.reshape(1,-1)
-        # scalers=joblib.load("/Users/sahityasehgal/Documents/Coding/DjangoApiTutorial/DjangoAPI/MyAPI/scalers.pkl")
-        # X=scalers.transform(unit)
-        # y_pred=mdl .predict(X)
-        # y_pred=(y_pred>0.58)
-        # newdf=pd.DataFrame(y_pred, columns=['Status'])
-        # newdf=newdf.replace({True:'Approved', False:'Rejected'})
-        # return JsonResponse('Your Status is {}'.format(newdf), safe=False)
-        return JsonResponse({'lista':lista,'res':'ok'}, safe=False)
+        URL = 'https://pe.indeed.com/jobs?q='+category+'&l='
+        INDEED = 'https://pe.indeed.com'
+
+        response = requests.get(URL)
+        html_soup = BeautifulSoup(response.text, 'html.parser')
+
+        job_containers = html_soup.find_all('div', class_ = 'jobsearch-SerpJobCard')
+
+        jobs = []
+        id = 1
+        for etq in job_containers:
+            
+            anchordiv = etq.h2
+            anchor = anchordiv.find('a', href=True)
+            link = anchor['href']
+
+            footer = etq.find('div',class_="jobsearch-SerpJobCard-footer")
+            span = footer.find('span',class_="date")
+            date = span.text
+
+            title = str(etq.h2.a.text).strip()
+
+            companydiv = etq.find('div', class_ = 'sjcl')
+            # print(em)
+            companydiv.find('div',class_="company")
+            company = str(companydiv.span.text).strip()
+
+            companydiv.find("div",class_="location")
+            precity = str(companydiv.text).strip()
+            city = precity.split('\n\n\n')[1]
+            city = city.strip()
+            # print(city)
+
+
+            summary = etq.find("div",class_="summary")
+            # print(summary.ul)
+            uls = summary.ul
+
+            lis=[]
+            idd = 1
+            for li in uls.find_all("li", recursive=True): 
+                dic = {'id':"idd"+str(id)+str(idd),'li':li.text}
+                lis.append(dic)
+                idd=idd+1
+            # obj =  "{ 'title':'"+title+"','company':'"+company+"','city':'"+city+"','description':'"+lis+"'}"
+            obj = {'id':"id"+str(id),'date':date,'link':INDEED+link,'title':title,'company':company,'city':city,'description':lis}
+
+            jobs.append(obj)
+            id=id+1
+
+        return JsonResponse({'lista':category,'res':'ok',"jobs":jobs}, safe=False)
+
     except ValueError as e:
         return Response(e.args[0], status.HTTP_400_BAD_REQUEST)
+
+
+
+
+
+
+
+def proccess(document):
+
+    categories = ['Administrador de sistemas y Devops', 
+                  'Analista financiero',
+                  'Asociado consultor', 
+                  'Asociado de proyecto',
+                  'Desarrollador de aplicaciones móviles',
+                  'Desarrollador de Javascript',
+                  'Desasrrollador Full Stack',
+                  'Desarrollador Ruby On Rails',
+                  'Desasrrollador web',
+                  'Desarrollador de Java',
+                  'Desarrollador web PHP',
+                  'Desarrollo web python',
+                  'Diseñador gráfico',
+                  'Editor Asociado',
+                  'Especialista en datos',
+                  'Generalista de Recursos Humanos Asociado',
+                  'Ingeniero de diseño de hardware',
+                  'Ingeniero de pruebas de calidad de software',
+                  'Ingeniero de software',
+                  'Ingeniero de ventas',
+                  'marketing digital',
+                  'Oficial de recaudación de fondos'];
+
+    news_train = skd.load_files('files/nuevos/train/', categories= categories, encoding= 'ISO-8859-1')
+    news_test = skd.load_files('files/nuevos/test/',categories= categories, encoding= 'ISO-8859-1')
+
+    # print(news_train.target_names)
+
+    count_vect = CountVectorizer()
+    x_train_tf = count_vect.fit_transform(news_train.data)
+    x_train_tf.shape
+
+    tfidf_transformer = TfidfTransformer()
+    x_train_tfidf = tfidf_transformer.fit_transform(x_train_tf)
+    # print(x_train_tfidf)
+
+    clf = MultinomialNB().fit(x_train_tfidf,news_train.target)
+
+    x_test_tf = count_vect.transform(news_test.data)
+    x_test_tfidf =  tfidf_transformer.fit_transform(x_test_tf)
+    # predicted = clf.predict(x_test_tfidf)
+
+    
+    docs_news = [document]
+    x_new_counts = count_vect.transform(docs_news)
+    x_new_tfidf =  tfidf_transformer.transform(x_new_counts)
+    predicted = clf.predict(x_new_tfidf)
+
+    for x in predicted:
+        print(news_train.target_names[x])
+        # print(x)
+    return news_train.target_names[x]
+
+
+def keywords_function(category):
+
+        switcher = {
+            "Administrador de sistemas y Devops": "",
+            "Analista financiero": "",
+            "Asociado consultor": "",
+            "Asociado de proyecto": "",
+            "Desarrollador de aplicaciones móviles": "",
+            "Desarrollador de Javascript": "",
+            "Desasrrollador Full Stack": "",
+            "Desarrollador Ruby On Rails": "",
+            "Desasrrollador web": "",
+            "Desarrollador de Java": "",
+            "Desarrollador web PHP": "",
+            "Desarrollo web python": "",
+            "Diseñador gráfico":"UX/UI/frontend/illustrator/photoshop/figma/diseño gráfico/diseñador gráfico",
+            "Editor Asociado": "",
+            "Especialista en datos": "",
+            "Generalista de Recursos Humanos Asociado": "",
+            "Ingeniero de diseño de hardware": "",
+            "Ingeniero de pruebas de calidad de software":"",
+            "Ingeniero de ventas": "",
+            "marketing digital": "",
+            "Ingeniero de software": "",
+            "Oficial de recaudación de fondos":"",
+
+        }
+        # Get the function from switcher dictionary
+        func = switcher.get(category, lambda: "Invalid value")
+        return func
 
 
 
@@ -211,3 +329,12 @@ def normalize(words):
     return words
 
 # words = normalize(words)
+
+
+class Object(): 
+    def __init__(self, title):
+        self.title = title
+    
+    def __str__(self):
+        json_="{title:"+self.nombre+"}"
+        return json_
