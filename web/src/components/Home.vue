@@ -13,7 +13,7 @@
             <div class="col-md-4">
                 <div class="form-group">
                   <input type="file" required @change="onFileSelected" class="form-control" accept=".pdf,.docx" name="cv" id="cv">
-                  <label for="cv">Sube tu CV</label>
+                  <label for="cv">Subir CV</label>
                 </div>
             </div>
                   </div>
@@ -63,7 +63,7 @@ export default {
                 console.log(response.data);
                 
                 if(response.data.res == "ok"){
-                  this.$router.push({name:'recomendation',params:{p:response.data.text}})
+                  this.$router.push({name:'recomendation',params:{p:response.data.text,jobs:response.data.jobs}})
                 }
                 // location.href="/prueba/"
             }).catch((error)=>{
